@@ -1,0 +1,395 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    /* padding: 20px; */
+    font-size: 16px;
+    background-color: peachpuff;
+    transition: background-color 1s ease;
+
+    max-width: 900px;
+    padding: 10px;
+    padding-bottom: 5px;
+    margin-bottom: 5vh;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header{
+    text-align: center;
+}
+
+#forum{
+    /* margin: 1px;
+    background-color: antiquewhite;
+    padding: 20px;
+    border: 1px solid white;
+    margin-bottom: 100px; */
+    min-height: 500px;
+}
+
+#new-room, #login, #activity, #setting, #uploads{
+    border: 1px solid #4b4747;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: linen;
+    text-align: center;
+}
+
+#activity {
+    max-height: 500px;
+    overflow: scroll;
+}
+
+#filter-buttons button.active {
+    background-color: burlywood;
+}
+
+#activity-list div {
+    border-bottom: solid 0.3px #80808014;
+}
+
+#user{
+    font-size: 20px;
+}
+h2 {
+    font-size: 24px;
+    margin-top: 0;
+}
+.room {
+    border: 1px solid #4b4747;
+    margin-bottom: 80px;
+    padding: 10px;
+    background-color: white;
+}
+.post {
+    border: 1px solid #4b4747;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: linen;
+}
+.input-post{
+    border: 1px solid #4b4747;
+    margin-top: 20px;
+    margin-bottom: 60px;
+    padding: 10px;
+    background-color: linen;
+}
+.postContent{
+    margin-left: unset;
+}
+.comment {
+    margin-left: 20px;
+    margin-top: 20px;
+}
+.comment-data{
+    margin-left: 20px;
+    margin-bottom: 20px;
+    border-left: 1px solid #cab7b7;
+}
+.reply {
+    margin-left: 20px;
+    border-left: 1px solid #cab7b7;
+    padding-left: 10px;
+    position: relative;
+}
+.reply-container {
+    display: flex;
+    flex-direction: column;
+}
+.comment-container > .input-container,
+.reply-container > .input-container {
+    display: none;
+}
+.input-toggle {
+    cursor: pointer;
+    color: darkgrey;
+    text-decoration: underline;
+    font-size: 12px;
+    margin-bottom: 10px;
+    font-style: italic;
+    border-top: #dfdada 1px solid;
+}
+.input-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+.input-container input[type="text"] {
+    flex: 1;
+    margin-right: 10px;
+    padding: 5px;
+    font-size: 16px;
+}
+
+input[type="text"] {
+    font-size: 16px;
+    padding: 5px;
+}
+button {
+    font-size: 16px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.user-tag {
+    font-weight: bold;
+}
+
+p.isi-post {
+    white-space: pre-wrap;
+}
+
+.isi-post{
+    padding: 20px 3px;
+    margin-top: 10px;
+}
+
+textarea.commentContent{
+    width: 100%;
+}
+
+textarea.replyContent{
+    width: 100%;
+}
+
+.user-tag{
+    /* display: block; */
+}
+
+.time-tag{
+    color: #80808054;
+}
+
+input, textarea {outline:none}
+
+.read-post{
+    margin-top: 1px;
+}
+.read-comment{
+    margin-top: 5px;
+    /* white-space: pre-wrap; */
+}
+.read-reply{
+    margin-top: 5px;
+    /* white-space: pre-wrap; */
+}
+
+.judul-post{
+    font-size: 30px;
+    background-color: burlywood;
+    cursor: pointer;
+    padding-right: 0.3em;
+}
+
+.judul-post::before {
+    content: '📝';
+    display: inline-block;
+    margin-right: 0.2em; /* Sesuaikan jarak antara emoji dan teks */
+}
+
+.nama-room{
+    text-align: center;
+    background-color: darkseagreen;
+    cursor: pointer;
+}
+
+.nama-room::before {
+    content: '🛋️';
+    display: inline-block;
+    margin-right: 0.5em; /* Sesuaikan jarak antara emoji dan teks */
+}
+
+.hidden{
+    display: none;
+}
+
+.animation {
+    animation: changeOpacity 2s infinite alternate; /* Animasi perubahan opacity latar belakang */
+}
+
+@keyframes changeOpacity {
+    0% { opacity: 1; } /* Opacity awal (penuh) */
+    100% { opacity: 0.4; } /* Opacity akhir (lebih transparan) */
+}
+
+.btn-comment {
+    background-color: burlywood;
+    padding: 10px;
+    border: solid 1px;
+    margin-left: 5px;
+}
+
+.btn-reply {
+    background-color: burlywood;
+    padding: 6px;
+    border: solid 1px;
+    margin-left: 5px;
+}
+
+.notification-icon {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .badge {
+    position: absolute;
+    top: -15px;
+    left: -8px;
+    background-color: #ff0000;
+    color: white;
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 12px;
+    min-width: 18px;
+    text-align: center;
+  }
+  
+  .notification-icon i {
+    font-size: 24px;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.md {
+    /* margin: 0.2em; */
+    /* margin-bottom: 1em; */
+    background-color: #ffffff4d;
+    border-radius: 5px;
+    /* line-height: 1.6; */
+    margin-bottom: 5px;
+}
+
+/* .md p{
+    margin: 0;
+} */
+
+/* Gaya untuk Setiap Jenis Tag */
+.md p,
+.md ul,
+.md ol,
+.md pre,
+.md table {
+    /* margin-bottom: 16px; */
+    margin: 0;
+}
+
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+    /* margin-top: 24px;
+    margin-bottom: 16px; */
+    margin: 0;
+    font-weight: bold;
+}
+
+.md p {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.md blockquote {
+    margin-left: 0;
+    padding: 0 16px;
+    color: #666;
+    border-left: 4px solid #ccc;
+}
+
+.md ul,
+.md ol {
+    padding-left: 20px;
+}
+
+.md ul li,
+.md ol li {
+    /* margin-bottom: 8px; */
+    margin: 0;
+}
+
+.md a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.md a:hover {
+    text-decoration: underline;
+}
+
+.md pre {
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.md code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.md img {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    margin: 16px auto;
+    cursor: pointer;
+}
+
+.md hr {
+    border: none;
+    height: 1px;
+    background-color: #ccc;
+    margin: 24px 0;
+}
+
+.md table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.md th,
+.md td {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+}
+
+.md th {
+    font-weight: bold;
+    background-color: #f8f9fa;
+}
+
+.md tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.md blockquote{
+    direction: rtl;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+#uploads{
+    overflow: scroll;
+}

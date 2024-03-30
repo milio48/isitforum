@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>isitForum</title>
+
+<link rel="stylesheet" href="assets/bootstrap-reboot.min.css">
+<link rel="stylesheet" href="assets/simplemde.min.css">
+<script src="assets/simplemde.min.js"></script>
+<script src="assets/marked.min.js"></script>
+
+<link rel="stylesheet" href="_style.css">
+</head>
+
+
+<body>
+<div class="header">
+    <h1 id="nama-forum"></h1>
+</div>
+
+<div id="forum" style="display: none;">
+</div>
+
+<div id="new-room" style="display: none;">
+    <h2>Buat Room Baru</h2>
+    <div class="input-container" style="margin-bottom: 30px;">
+        <input type="text" id="newRoomName" placeholder="Nama Room Baru" autocomplete="off">
+        <button onclick="buatRoom()" class="btn-comment">Tambah Room</button>
+    </div>
+</div>
+
+<div id="login">
+    <h2>Login</h2>
+    <select name="user" id="user">
+        <option value="" selected="" disabled="">Pilih User</option>
+    </select>
+    <br><br>
+        <select id="pertanyaan-login">
+            <option value="" selected="" disabled="">Pilih Pertanyaan Rahasia</option>
+        </select>
+        <br>
+        <input type="text" id="jawaban-login" placeholder="Jawaban Rahasia" autocomplete="off">
+        <br>
+    <button onclick="login()" class="btn-comment">Login</button>
+
+    <br><br><hr>
+    <div id="new-user">
+        <h2>Register</h2>
+        <br>
+        <select id="colorSelect" required>
+            <option value="" selected="" disabled="">Pilih Warna</option>
+        </select>
+        <br>
+        <input type="text" id="newUser" placeholder="Username Kamu" autocomplete="off">
+        <br><br>
+        <select id="pertanyaan-daftar">
+            <option value="" selected="" disabled="">Pilih Pertanyaan Rahasia</option>
+        </select>
+        <br>
+        <input type="text" id="jawaban-daftar" placeholder="Jawaban Rahasia" autocomplete="off">
+        <br>
+        <br>
+        <p>Kode untuk mendaftar :</p>
+        <input type="text" id="kode-daftar" placeholder="Kode Untuk Mendaftar" autocomplete="off">
+        <br>
+        <button onclick="newUser()" class="btn-comment">New User</button>
+    </div>
+</div>
+
+<div id="activity" style="display: none;">
+    <h1>Aktivitas</h1>
+    <div id="filter-buttons">
+        <button onclick="filterActivity(event, 'all')" style="border: solid 1.7px brown;"> All</button>
+        <button onclick="filterActivity(event, 'user')">👤 user</button>
+        <button onclick="filterActivity(event, 'room')">🛋️ Room</button>
+        <button onclick="filterActivity(event, 'post')">📝 Post</button>
+        <button onclick="filterActivity(event, 'comment')">💬 Comment</button>
+        <button onclick="filterActivity(event, 'reply')">↩️ Reply</button>
+    </div>
+    <br>
+    <span>Limit 40 :</span>
+    <br>
+    <div id="activity-list" style="cursor: pointer"></div>
+    <div id="activity-more" style="margin-top: 10px;">
+        <input type="text" id="limit-activity" size="3" value="50">
+        <button class="btn-comment" onclick="renderActivity(this.previousElementSibling.value)">Load More</button>
+    </div>
+</div>
+
+<div id="setting" style="display: none;">
+    <h2>Setting</h2>
+    <select id="colorSelectSetting" required>
+        <option value="" selected="" disabled="">Pilih Warna</option>
+    </select>
+    <br>
+    <input type="text" disabled id="userSetting" autocomplete="off">
+    <br><br>
+    <select id="pertanyaan-setting">
+        <option value="" selected="" disabled="">Pilih Pertanyaan Rahasia</option>
+    </select>
+    <br>
+    <input type="text" id="jawaban-setting" placeholder="Jawaban Rahasia" autocomplete="off">
+    <br>
+    <button onclick="updateUser()" class="btn-comment">Update</button>
+
+    <br><br><hr>
+    <h2>Logout</h2>
+    <button onclick="logout()" style="background-color: red;">Logout</button>
+</div>
+
+
+<div id="uploads" style="display: none;">
+    <h1>List  Uploads <button onclick="location.reload()">🔄</button></h1>
+    <div id="uploads-list">
+        <table  style="margin: 0 auto;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>File Name</th>
+                    <th>User ID</th>
+                    <th>Created At</th>
+                    <th>Copy Code</th>
+                </tr>
+            </thead>
+            <tbody id="uploads-tbody">
+            </tbody></table>
+    </div>
+</div>
+
+
+
+
+<script src="_utility.js"></script>
+<script src="_dynamic.js"></script>
+<script src="_render.js"></script>
+<script src="_sse.js"></script>
+<script src="_ajax.js"></script>
+<script src="_template.js"></script>
+
+
+</body>
+</html>
