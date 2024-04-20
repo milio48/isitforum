@@ -44,6 +44,7 @@ pada folder database, edit json yang ada di folder data dan hapus folder cache.
 - simpleMDE
 - markedJS
 - bootstrap-reboot
+- iki64.js
 - ...
 
 
