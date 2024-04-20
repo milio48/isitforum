@@ -52,7 +52,7 @@ if ($request_uri === '/' || $request_uri === '/index.html') {
 // Memeriksa apakah file ada
 if (file_exists($filepath) && !is_dir($filepath)) {
     // Mengecek apakah file diizinkan untuk diakses secara langsung
-    $allowed_extensions = array("html", "htm", "css", "js", "php", "jpg", "jpeg", "png", "gif");
+    $allowed_extensions = array("html", "htm", "css", "js", "php", "jpg", "jpeg", "png", "gif", "ico");
     $ext = pathinfo($filepath, PATHINFO_EXTENSION);
     if (in_array($ext, $allowed_extensions)) {
         // Melayani file statis yang sesuai
