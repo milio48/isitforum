@@ -228,6 +228,15 @@ input, textarea {outline:none}
     margin-left: 5px;
 }
 
+.btn-enkrip {
+    cursor: pointer;
+}
+
+.deleteByMod{
+    color: #ff00004a;
+    cursor:pointer;
+}
+
 .notification-icon {
     position: relative;
     display: inline-block;
@@ -271,6 +280,7 @@ input, textarea {outline:none}
     border-radius: 5px;
     /* line-height: 1.6; */
     margin-bottom: 5px;
+    word-wrap: break-word;
 }
 
 /* .md p{
@@ -392,4 +402,9 @@ table, th, td {
 
 #uploads{
     overflow: scroll;
+}
+
+
+[password]{
+    background-color: greenyellow;
 }

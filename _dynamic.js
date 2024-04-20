@@ -98,11 +98,9 @@ function login(){
 
     postData('api.php', { 'login': { user, pertanyaanLogin, jawabanLogin } })
     .then(response => {
-        // console.log(response);
         if(!response.error){
             saveTokenToLocalStorage(response.token);
             payload = readPayloadFromJwt();
-            // console.log(payload);
             userName = payload.username;
             userColor = payload.color;
             userId = payload.userid;
@@ -142,7 +140,6 @@ function cekLogin(){
         document.getElementById('jawaban-login').value;
     
         payload = readPayloadFromJwt();
-        // console.log(payload);
         userName = payload.username;
         userColor = payload.color;
         userId = payload.userid;
@@ -217,7 +214,15 @@ function buatPost(buttonElement) {
     const roomId = buttonElement.parentElement.parentElement.getAttribute('roomId');
     const postContent = parent.querySelector('.postContent').value.trim();
     // const postContentIsi = parent.querySelector('.postContentIsi').value.trim();
-    const postContentIsi = editorsMDE[roomId].value();
+    let postContentIsi = editorsMDE[roomId].value();
+
+    if(parent.querySelector('.btn-enkrip')){
+        const password = parent.querySelector('.btn-enkrip').getAttribute('password');
+        if(password){
+            postContentIsi = iki64_encode(postContentIsi, password);
+        }
+    }
+
     if (!postContent) {
         alert("Isi post tidak boleh kosong!");
         return;
@@ -252,12 +257,20 @@ function buatPost(buttonElement) {
 }
 
 function buatComment(buttonElement) {
-    const commentContent = buttonElement.previousElementSibling.value.trim();
+    var commentContent = buttonElement.previousElementSibling.value.trim();
     const postId = buttonElement.closest('.post').getAttribute('postid');
     const roomId = buttonElement.closest('.post').getAttribute('roomid');
+
     if (!commentContent) {
         alert("Isi komentar tidak boleh kosong!");
         return;
+    }
+
+    if(buttonElement.closest('.post').querySelector('.btn-enkrip')){
+        const password = buttonElement.closest('.post').querySelector('.btn-enkrip').getAttribute('password');
+        if(password){
+            commentContent = iki64_encode(commentContent, password);
+        }
     }
 
     postData('api.php', { 'newComment': {roomId, postId, commentContent}}, true)
@@ -288,10 +301,22 @@ function buatComment(buttonElement) {
 }
 
 function buatReply(buttonElement) {
-    const replyContent = buttonElement.previousElementSibling.value.trim();
+    var replyContent = buttonElement.previousElementSibling.value.trim();
     const commentId = buttonElement.closest('.comment').getAttribute('commentid');
     const postId = buttonElement.closest('.comment').getAttribute('postid');
     const roomId = buttonElement.closest('.comment').getAttribute('roomid');
+
+    if (!replyContent) {
+        alert("Isi reply tidak boleh kosong!");
+        return;
+    }
+
+    if(buttonElement.closest('.post').querySelector('.btn-enkrip')){
+        const password = buttonElement.closest('.post').querySelector('.btn-enkrip').getAttribute('password');
+        if(password){
+            replyContent = iki64_encode(replyContent, password);
+        }
+    }
 
     postData('api.php', { 'newReply': {roomId, postId, commentId, replyContent}}, true)
         .then(response => {
@@ -385,20 +410,39 @@ function openRoom(elem){
 function openPost(elem){
     let post;
     if(elem.getAttribute('postid')){
-        post = document.querySelector(`.post[postid='${elem.getAttribute('postid')}']`);
+        if(document.querySelector(`.post[postid='${elem.getAttribute('postid')}']`)){
+            post = document.querySelector(`.post[postid='${elem.getAttribute('postid')}']`);
+        }
     }else{
-        post = elem.closest('.post');
+        if(elem.closest('.post')){
+            post = elem.closest('.post');
+        }
+    }
+
+    if(post == null){
+        return;
     }
 
     const isiPost = post.querySelector('.isi-post');
     const commentContainer = post.querySelector('.comment-container');
     const inputPost = post.querySelector('.input-post');
+    const closePost = post.querySelector('.close-post');
 
-    post.style.marginBottom = post.style.marginBottom === '' ? '60px' : '';
-    post.style.marginTop = post.style.marginTop === '' ? '60px' : '';
+    post.style.marginBottom = post.style.marginBottom === '' ? '0' : '';
+    post.style.marginTop = post.style.marginTop === '' ? '0' : '';
     post.style.boxShadow = post.style.boxShadow === '' ? '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)' : '';
     commentContainer.style.display = commentContainer.style.display === 'none' ? 'block' : 'none';
     
+    // popup
+    post.style.width = post.style.width === '' ? '100%' : '';
+    post.style.height = post.style.height === '' ? '100%' : '';
+    post.style.left = post.style.left === '' ? '0' : '';
+    post.style.top = post.style.top === '' ? '0' : '';
+    post.style.position = post.style.position === '' ? 'fixed' : '';
+    closePost.style.display = closePost.style.display === 'none' ? '' : 'none';
+    post.style.overflow = post.style.overflow === '' ? 'scroll' : '';
+    document.body.style.overflow = document.body.style.overflow === '' ? 'hidden' : '';
+
     if(isiPost){
         isiPost.style.display = isiPost.style.display === 'none' ? 'block' : 'none';
     }
@@ -418,7 +462,11 @@ function openPost(elem){
 function editPostOpen(element){
     const post = element.closest('.post');
     const postId = post.getAttribute('postid');
-    console.log(post);
+
+    if(post.querySelector('.btn-enkrip')){
+        var password = post.querySelector('.btn-enkrip').getAttribute('password') || undefined;
+    }
+
 
     postData('api.php', { 'getPost': postId }, true)
         .then(response => {
@@ -432,11 +480,14 @@ function editPostOpen(element){
                 const postId = post._id;
                 const time = post.created_at;
                 const postContent= post.post.postContent;
-                const postContentIsi= post.post.postContentIsi;
+                var postContentIsi= post.post.postContentIsi;
                 const userid = post.userid;
                 const author = getAuthor(userid);
 
-                console.log(roomId, postId, postContent, postContentIsi, author.username, author.color, time);
+                if(password){
+                    postContentIsi = iki64_decode(postContentIsi, password);
+                }
+
                 const postElem = document.querySelector(`.room[roomid="${roomId}"] > .post[postid="${postId}"]`);
 
                 if(postElem.querySelector('.comment-container').style.display == 'none'){
@@ -467,8 +518,14 @@ function editPost(element){
     const postId = post.getAttribute('postid');
     const roomId = post.getAttribute('roomid');
     const postContent = post.querySelector('.postContent').value.trim();
-    const postContentIsi = editorsMDE[roomId].value();
-    console.log(post);
+    var postContentIsi = editorsMDE[roomId].value();
+
+    if(post.querySelector('.btn-enkrip')){
+        const password = post.querySelector('.btn-enkrip').getAttribute('password');
+        if(password){
+            postContentIsi = iki64_encode(postContentIsi, password);
+        }
+    }
 
     postData('api.php', { 'editPost': {postId, postContent, postContentIsi} }, true)
         .then(response => {
@@ -486,7 +543,6 @@ function editPost(element){
                 const userid = post.userid;
                 const author = getAuthor(userid);
 
-                // console.log(roomId, postId, postContent, postContentIsi, author.username, author.color, time);
                 location.reload();
             }
         })
@@ -528,6 +584,8 @@ function updateNotificationCount() {
   } else {
     badge.style.display = 'block';
   }
+
+  hideDeleted();
 }
 
 
@@ -578,3 +636,116 @@ function uploadImage(event){
     input.onchange = handleImageUpload;
     input.click();
 };
+
+
+// enkrip post
+function enkrip(w){
+    alert('apakah anda yakin ingin mempassword post ini? \n jika iya, maka anda harus tahu bahwa post akan di enkripsi menggunakan iki64 di sisi client dan hanya yang memiliki password yang bisa membaca post.');
+    let pw = prompt('Password');
+    if(pw){
+        w.setAttribute('password', pw);
+    }
+}
+
+function dekrip(w){
+    let post = w.closest('.post');
+
+    if(post.querySelector('.btn-enkrip').getAttribute('password')){
+        let listMd = post.querySelectorAll('.md');
+        listMd.forEach(md => {
+            if(md.getAttribute('dekrip') == null){
+                md.innerHTML = marked.parse(escapeHTML(iki64_decode(md.innerText, post.querySelector('.btn-enkrip').getAttribute('password'))));
+                md.setAttribute('dekrip', 'true');
+            }
+        })
+        return;
+    }
+
+    let pw = prompt('Password');
+    post.querySelector('.btn-enkrip').setAttribute('password', pw);
+
+    let listMd = post.querySelectorAll('.md');
+    listMd.forEach(md => {
+        if(isBase64(md.innerText)){
+            md.innerHTML = marked.parse(escapeHTML(iki64_decode(md.innerText, pw)));
+            md.setAttribute('dekrip', 'true');
+        }
+    })
+}
+
+function deleteByModerator(w){
+    var point;
+    var content;
+    if(w.parentElement.classList.contains('read-post')){
+        point = 'post';
+        content = {
+                    'point':'post',
+                    'roomid':w.closest('.post').getAttribute('roomid'),
+                    'postid':w.closest('.post').getAttribute('postid')
+                 };
+    }else if(w.parentElement.classList.contains('read-comment')){
+        point = 'comment';
+        content = {
+            'point':'comment',
+            'roomid':w.closest('.post').getAttribute('roomid'),
+            'postid':w.closest('.post').getAttribute('postid'),
+            'commentid':w.closest('.comment').getAttribute('commentid')
+         };
+    }else if(w.parentElement.classList.contains('read-reply')){
+        point = 'reply';
+        content = {
+            'point':'reply',
+            'roomid':w.closest('.post').getAttribute('roomid'),
+            'postid':w.closest('.post').getAttribute('postid'),
+            'commentid':w.closest('.comment').getAttribute('commentid'),
+            'replyid':w.closest('.reply').getAttribute('replyid')
+         };
+    }else if(w.parentElement.classList.contains('room')){
+        point = 'room';
+        content = {
+            'point':'room',
+            'roomid':w.closest('.room').getAttribute('roomid')
+         };
+    }
+
+    postData('api.php', { 'deleteByMod': content }, true)
+    .then(response => {
+        if(response.error && response.error.token){logout()}
+        if(response.error){
+            alert(response.error);
+            return false;
+        }else{
+            if(point=='post'){
+                document.querySelector(`.post[postid='${response._id}']`).remove();
+            }else if(point=='comment'){
+                document.querySelector(`.comment[commentid='${response._id}']`).remove();
+            }else if(point=='reply'){
+                document.querySelector(`.reply[replyid='${response._id}']`).remove();
+            }else if(point=='room'){
+                document.querySelector(`.room[roomid='${response._id}']`).remove();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Failed to post data:', error);
+        alert('Error');
+    });
+}
+
+
+function hideDeleted(){
+    var del = document.querySelectorAll('del');
+
+    del.forEach(d => {
+        if(d.parentElement.innerHTML == '⛔️ <del>Deleted by Moderator</del> ⛔️'){
+            d.parentElement.parentElement.parentElement.parentElement.remove();
+        }
+    })
+
+    var roomDel = document.querySelectorAll('.room');
+    roomDel.forEach(r => {
+        if(r.querySelector('.nama-room').innerText.search('⛔️') == 0){
+            r.querySelector('.nama-room').parentElement.remove();
+        }
+    })
+}

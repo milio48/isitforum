@@ -2,12 +2,9 @@ var now = new Date();
 var skrg = Math.floor(now.getTime() / 1000);
 localStorage.setItem('last', skrg);
 var last = localStorage.getItem('last');
-// console.log(`skrg: ${skrg}`);
-// console.log(`last: ${last}`);
 
 function ajax(){
     last = localStorage.getItem('last');
-    // console.log(`last update: ${last}`);
     postData(`ajax.php`, {'time':last}, true)
         .then(response => {
             if(response.error && response.error.token){logout()}
@@ -15,14 +12,11 @@ function ajax(){
                 alert(response.error);
                 return false;
             }else{
-                // console.log(response.length);
                 if(response.length!==0){
                     incrementNotification();
                     startAnimation('body');
-                    // console.log(response);
                     now = new Date();
                     skrg = Math.floor(now.getTime() / 1000);
-                    // console.log(`skrg update: ${skrg}`);
                     localStorage.setItem('last', skrg);
                 }
 
@@ -43,7 +37,6 @@ function ajax(){
                 if(json_data.post){
                     const posts = json_data.post;
                     posts.forEach(function(post) {
-                        // console.log(post);
                         const roomId = post.post.roomId;
                         const postId = post._id;
                         const time = post.created_at;
@@ -101,7 +94,6 @@ function ajax(){
                 if(json_data.activity){
                     const activities = json_data.activity;
                     activities.forEach(function(activity) {
-                        console.log(activity);
                         templateNewActivity(activity.activity, activity.point, activity.userid, activity.id, activity.created_at)
                     });
                 }

@@ -6,8 +6,6 @@ function runSSE(){
     eventSource.onmessage = function(event) {
         startAnimation('body');
         const json_data = JSON.parse(event.data);
-        // console.log(event.data);
-        // console.log(json_data);
         
         incrementNotification();
 
@@ -26,7 +24,6 @@ function runSSE(){
         if(json_data[0].post){
             const posts = json_data;
             posts.forEach(function(post) {
-                // console.log(post);
                 const roomId = post.post.roomId;
                 const postId = post._id;
                 const time = post.created_at;
@@ -84,7 +81,6 @@ function runSSE(){
         if(json_data[0].activity){
             const activities = json_data;
             activities.forEach(function(activity) {
-                console.log(activity);
                 templateNewActivity(activity.activity, activity.point, activity.userid, activity.id, activity.created_at)
             });
         }

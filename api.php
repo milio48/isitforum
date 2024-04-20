@@ -42,13 +42,15 @@ if(@$postData['read']=='forum'){
             'namaForum'=>$config['nama_forum'],
             'realtime'=>$config['realtime'],
             'reloadRealtime'=>$config['reload_realtime'],
-            'kodeDaftar'=>$config['kode_daftar']
+            'kodeDaftar'=>$config['kode_daftar'],
+            'moderator'=>$config['moderator']
         ]);
     }else{
         echo json_encode([
             'namaForum'=>$config['nama_forum'],
             'reloadRealtime'=>$config['reload_realtime'],
-            'realtime'=>$config['realtime']
+            'realtime'=>$config['realtime'],
+            'moderator'=>$config['moderator']
         ]);
     }
 }
@@ -325,4 +327,36 @@ if(@$postData['editPost']){
         'userid' => $verifiedPayload['userid'],
         'created_at' => getCurrentTimestamp()
     ]);
+}
+
+
+if(@$postData['deleteByMod']){
+    
+    if($verifiedPayload['username'] == $config['moderator']){
+        $result = [];
+        if($postData['deleteByMod']['point']=='post'){
+            $result = $postStore->updateById($postData['deleteByMod']['postid'], 
+                        [
+                            'post.postContentIsi' => '⛔️ ~Deleted by Moderator~ ⛔️',
+                        ]);
+        }elseif($postData['deleteByMod']['point']=='comment'){
+            $result = $commentStore->updateById($postData['deleteByMod']['commentid'], 
+                        [
+                            'comment.commentContent' => '⛔️ ~Deleted by Moderator~ ⛔️',
+                        ]);
+        }elseif($postData['deleteByMod']['point']=='reply'){
+            $result = $replyStore->updateById($postData['deleteByMod']['replyid'], 
+                        [
+                            'reply.replyContent' => '⛔️ ~Deleted by Moderator~ ⛔️',
+                        ]);
+        }elseif($postData['deleteByMod']['point']=='room'){
+            $room = $roomStore->findById($postData['deleteByMod']['roomid']);
+            $result = $roomStore->updateById($postData['deleteByMod']['roomid'], 
+                        [
+                            'room' => '⛔️ '.$room['room'],
+                        ]);
+        }
+        
+        echo json_encode($result);
+    }
 }

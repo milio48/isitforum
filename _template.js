@@ -1,6 +1,11 @@
 function templateRoom(roomId, roomName){
+    if(window.moderator == window.userName){
+        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);" style="display:block; text-align:right;">[Delete]</span>`;
+    }
+
     const roomElement = `<div class="room" roomId="${roomId}">
                             <h2 class="nama-room" onclick="openRoom(this)">${roomName}</h2>
+                            ${deleteByModerator || ''}
                             <div class="input-toggle" onclick="toggleNewPost(this)">Buat Post Baru</div>
                             <div class="input-post" style="display:none">
                                 <input type="text" class="postContent" placeholder="Judul Postingan">
@@ -10,6 +15,7 @@ function templateRoom(roomId, roomName){
                                 </div>
                                 <br>
                                 <button onclick="buatPost(this)" class="btn-comment">Tambah Post</button>
+                                <span class="btn-enkrip" onclick="enkrip(this)">🔒</span>
                             </div>
                         </div>`;
     document.querySelector('#forum').innerHTML += roomElement;
@@ -24,6 +30,14 @@ function templatePost(roomId, postId, postContent, postContentIsi, userName, use
         var editedCheckElem = `<span class="edited-post" style="color: brown;" onclick="alert('Diedit : '+formatTime(${editedCheck}));">[edited]</span>`;
     }else{var editedCheckElem=''}
 
+    if(isBase64(postContentIsi)){
+        var passwordCheck = `<span class="btn-enkrip" onclick="dekrip(this)">🔒</span>`;
+    }
+
+    if(window.moderator == window.userName){
+        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);">[Delete]</span>`;
+    }
+
     const postElement = `<div class="post" postid="${postId}" roomId="${roomId}">
                         <div class="read-post">
                             <span class="judul-post" onclick="openPost(this)">${postContent}</span>
@@ -31,6 +45,9 @@ function templatePost(roomId, postId, postContent, postContentIsi, userName, use
                             <span class="time-tag" onclick="alert('Dibuat : '+formatTime(${time}))" created_at="${time}">${timeAgo(time)}</span>
                             ${editedCheckElem}
                             ${edit}
+                            ${passwordCheck || ''}
+                            ${deleteByModerator || ''}
+                            <span class="close-post" onclick="openPost(this)"  style="display:none; color: grey; cursor:pointer; position:absolute; right:0; margin-right:10px">[x]</span>
                             <div class="isi-post md" style="display:none">${marked.parse(escapeHTML(postContentIsi))}</div>
                         </div>
                         <div class="comment-container" style="display:none">
@@ -59,10 +76,14 @@ function templatePost(roomId, postId, postContent, postContentIsi, userName, use
 }
 
 function templateComment(roomId, postId, commentId, commentContent, userName, userColor, time){
+    if(window.moderator == window.userName){
+        var deleteByModerator = `<span class="deleteByMod" onclick="deleteByModerator(this);">[Delete]</span>`;
+    }
     const commentElement = `<div class="comment" commentid="${commentId}" postId="${postId}" roomId="${roomId}">
                                 <div class="read-comment">
                                     <span class="user-tag" style="color: ${listWarna[userColor]}">[${userName}]</span>
                                     <span class="time-tag" onclick="alert(formatTime(${time}))" created_at="${time}">${timeAgo(time)}</span>
+                                    ${deleteByModerator || ''}
                                     <div class="isi-comment md">${marked.parse(escapeHTML(commentContent))}</div>
                                 </div>
                                 <div class="reply-container">
@@ -79,10 +100,14 @@ function templateComment(roomId, postId, commentId, commentContent, userName, us
 }
 
 function templateReply(roomId, postId, commentId, replyId, replyContent, userName, userColor, time){
+    if(window.moderator == window.userName){
+        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);">[Delete]</span>`;
+    }
     const replyElement = `<div class="reply" replyId="${replyId}" postId="${postId}" commentId="${commentId}" roomId="${roomId}">
                             <div class="read-reply">
                                 <span class="user-tag" style="color: ${listWarna[userColor]}">[${userName}]</span>
                                 <span class="time-tag" onclick="alert(formatTime(${time}))" created_at="${time}">${timeAgo(time)}</span>
+                                ${deleteByModerator || ''}
                                 <div class="isi-reply md">${marked.parse(escapeHTML(replyContent))}</div>
                             </div>
                         </div>`;
@@ -103,6 +128,7 @@ function templateEditPost(postContent, postContentIsi){
                                 <br>
                                 <button onclick="editPost(this)" class="btn-comment" style="background-color:grey" onclick="location.reload()">Cancel</button>
                                 <button onclick="editPost(this)" class="btn-comment">Edit Post</button>
+                                <span class="btn-enkrip" onclick="enkrip(this)">🔒</span>
                             </div>
     `;
     return editPostElement;
@@ -112,24 +138,41 @@ function templateNewActivity(activity, point, userid, id, created_at) {
     var activityListDiv = document.getElementById("activity-list");
     var detailPoint;
     var emoji;
+    var dom;
 
     const author = getAuthor(userid);
-    // console.log(author);
 
     if(point=='room'){
         emoji = '🛋️';
-        detailPoint = document.querySelector(`.room[roomid="${id}"] > .nama-room`).innerText;
+        try {
+            detailPoint = document.querySelector(`.room[roomid="${id}"] > .nama-room`).innerText;
+        } catch (error) {
+            detailPoint = 'deleted ⛔️';           
+        }
     }else if(point=='post'){
         emoji = '📝';
-        detailPoint = document.querySelector(`.post[postid="${id}"]`).querySelector(`.judul-post`).innerText;
+        try {
+            detailPoint = document.querySelector(`.post[postid="${id}"]`).querySelector(`.judul-post`).innerText;
+        } catch (error) {
+            detailPoint = 'deleted ⛔️';
+        }
+        
     }else if(point=='comment'){
         emoji = '💬';
-        var commentTarget = document.querySelector(`.comment[commentid="${id}"]`).getAttribute(`postid`);
-        detailPoint = document.querySelector(`.post[postid="${commentTarget}"]`).querySelector(`.judul-post`).innerText;
+        try {
+            var commentTarget = document.querySelector(`.comment[commentid="${id}"]`).getAttribute(`postid`);
+            detailPoint = document.querySelector(`.post[postid="${commentTarget}"]`).querySelector(`.judul-post`).innerText;
+        } catch (error) {
+            detailPoint = 'deleted ⛔️';
+        }
     }else if(point=='reply'){
         emoji = '↩️';
-        var replyTarget = document.querySelector(`.reply[replyid="${id}"]`).getAttribute(`postid`);
-        detailPoint = document.querySelector(`.post[postid="${replyTarget}"]`).querySelector(`.judul-post`).innerText;
+        try {
+            var replyTarget = document.querySelector(`.reply[replyid="${id}"]`).getAttribute(`postid`);
+            detailPoint = document.querySelector(`.post[postid="${replyTarget}"]`).querySelector(`.judul-post`).innerText;
+        } catch (error) {
+            detailPoint = 'deleted ⛔️';
+        }
     }else if(point=='user'){
         emoji = '👤';
         detailPoint = ``;

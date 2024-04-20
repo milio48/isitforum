@@ -2,6 +2,7 @@ var userName;
 var userColor;
 var userId;
 var jwtToken ='';
+var moderator = '';
 
 var listUser;
 var listWarna;
@@ -111,7 +112,6 @@ function readPayloadFromJwt(inputJwt) {
         jwtToken = getTokenFromLocalStorage();
 
         if (!jwtToken) {
-            // console.log("Token JWT tidak ditemukan dalam localStorage.");
             return null;
         }
     }
@@ -124,7 +124,6 @@ function readPayloadFromJwt(inputJwt) {
         const decodedToken = JSON.parse(atob(jwtToken.split('.')[1]));
         const currentTime = Math.floor(Date.now() / 1000);
 
-        // console.log(decodedToken.exp);
         if(decodedToken.exp > currentTime){
             return decodedToken;
         }else{
@@ -158,26 +157,34 @@ function scrollToPoint(point, id) {
         go(selector);
     }else if(point=='post'){
         selector = `.post[postid='${id}']`;
-        if(document.querySelector(selector).style.display == 'none'){
-            document.querySelector(selector).style.display = 'block';
-            go(selector);
-        }else{
+        try {
+            if(document.querySelector(selector).style.display == 'none'){
+                document.querySelector(selector).style.display = 'block';
+            }
+        } catch (error) {
+            
+        }finally{
             go(selector);
         }
     }else if(point=='comment'){
         selector = `.comment[commentid='${id}']`;
-        if(document.querySelector(selector).closest('.comment-container').style.display == 'none'){
-            openPost(document.querySelector(selector));
-            go(selector);
-        }else{
+
+        try {
+            if(document.querySelector(selector).closest('.comment-container').style.display == 'none'){
+                openPost(document.querySelector(selector));
+            }
+        } catch (error) {}finally{
             go(selector);
         }
     }else if(point=='reply'){
         selector = `.reply[replyid='${id}']`;
-        if(document.querySelector(selector).closest('.comment-container').style.display == 'none'){
-            openPost(document.querySelector(selector));
-            go(selector);
-        }else{
+        try {
+            if(document.querySelector(selector).closest('.comment-container').style.display == 'none'){
+                openPost(document.querySelector(selector));
+            }
+        } catch (error) {
+            
+        }finally{
             go(selector);
         }
     }else if(point=='user'){
@@ -201,12 +208,14 @@ function scrollToPoint(point, id) {
 }
 
 function getAuthor(id){
-    // console.log('author-'+id);
     if(arraySearch(listUser, '_id', id)){
         return arraySearch(listUser, '_id', id);
     }else{
         console.info('user baru?');
-        return readAllUser(id);
+        // return readAllUser(id);
+        if(confirm("Terdeteksi terdapat user baru. \n tekan ok untuk memuat ulang dan update data. \n tekan cancel untuk melanjutkan")){
+            location.reload();
+        }
     }
 }
 
@@ -261,4 +270,9 @@ function copyToClipboard(text, pesan) {
     if(typeof pesan == 'string'){
         alert(pesan);
     }
+}
+
+function isBase64(str) {
+    const regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
+    return regex.test(str);
 }

@@ -8,6 +8,7 @@ function readForum(){
 
                     realtime = response.realtime;
                     reloadRealtime = response.reloadRealtime;
+                    moderator = response.moderator;
                 })
                 .catch(error => {
                     console.error('Failed to post data:', error);
@@ -185,6 +186,7 @@ function renderReply(){
                 templateReply(roomId, postId, commentId, replyId, replyContent, author.username, author.color, time);
             });
             renderActivity(40);
+            hideDeleted();
         })
         .catch(error => {
             console.error('Failed to post data:', error);
@@ -201,7 +203,6 @@ function renderActivity(limit=40){
                 alert(response.error);
                 return false;
             }else{
-                // console.log(response);
                 response.forEach(function(activity) {
                     templateNewActivity(activity.activity, activity.point, activity.userid, activity.id, activity.created_at);
                 });

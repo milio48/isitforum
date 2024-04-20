@@ -26,6 +26,7 @@ $config['nama_forum']           = 'isitForum';          // nama forum yang akan 
 $config['folder_db']            = "db_isitforum";       // folder database
 $config['folder_upload']        = "uploads";            // folder upload
 $config['private_key']          = 'sangatPrivateCuy';   // jwt private key
+$config['moderator']            = '';                   // set moderator username
 $config['realtime']             = 'ajax';               // sse atau ajax
 $config['kode_daftar']          = 'isitforum';          // kode yang harus dimasukkan untuk mendaftar user baru
 $config['public_kode_daftar']   = false;                // true jika kode daftar harus di-public
