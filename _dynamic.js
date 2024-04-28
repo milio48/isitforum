@@ -708,28 +708,30 @@ function deleteByModerator(w){
          };
     }
 
-    postData('api.php', { 'deleteByMod': content }, true)
-    .then(response => {
-        if(response.error && response.error.token){logout()}
-        if(response.error){
-            alert(response.error);
-            return false;
-        }else{
-            if(point=='post'){
-                document.querySelector(`.post[postid='${response._id}']`).remove();
-            }else if(point=='comment'){
-                document.querySelector(`.comment[commentid='${response._id}']`).remove();
-            }else if(point=='reply'){
-                document.querySelector(`.reply[replyid='${response._id}']`).remove();
-            }else if(point=='room'){
-                document.querySelector(`.room[roomid='${response._id}']`).remove();
+    if(confirm(`apakah anda yakin ingin menghapus ${point}?`) == true){
+        postData('api.php', { 'deleteByMod': content }, true)
+        .then(response => {
+            if(response.error && response.error.token){logout()}
+            if(response.error){
+                alert(response.error);
+                return false;
+            }else{
+                if(point=='post'){
+                    document.querySelector(`.post[postid='${response._id}']`).remove();
+                }else if(point=='comment'){
+                    document.querySelector(`.comment[commentid='${response._id}']`).remove();
+                }else if(point=='reply'){
+                    document.querySelector(`.reply[replyid='${response._id}']`).remove();
+                }else if(point=='room'){
+                    document.querySelector(`.room[roomid='${response._id}']`).remove();
+                }
             }
-        }
-    })
-    .catch(error => {
-        console.error('Failed to post data:', error);
-        alert('Error');
-    });
+        })
+        .catch(error => {
+            console.error('Failed to post data:', error);
+            alert('Error');
+        });
+    }
 }
 
 
