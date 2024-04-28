@@ -47,7 +47,7 @@ function templatePost(roomId, postId, postContent, postContentIsi, userName, use
                             ${edit}
                             ${passwordCheck || ''}
                             ${deleteByModerator || ''}
-                            <span class="close-post" onclick="openPost(this)"  style="display:none; color: grey; cursor:pointer; position:absolute; right:0; margin-right:10px">[x]</span>
+                            <span class="close-post" onclick="openPost(this)"  style="display:none; color: grey; cursor:pointer; position:absolute; right:0; margin-right:10px; background-color: #ff000017;">[x]</span>
                             <div class="isi-post md" style="display:none">${marked.parse(escapeHTML(postContentIsi))}</div>
                         </div>
                         <div class="comment-container" style="display:none">
