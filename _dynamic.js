@@ -258,6 +258,7 @@ function buatPost(buttonElement) {
 
 function buatComment(buttonElement) {
     var commentContent = buttonElement.previousElementSibling.value.trim();
+    let password, passworded;
     const postId = buttonElement.closest('.post').getAttribute('postid');
     const roomId = buttonElement.closest('.post').getAttribute('roomid');
 
@@ -267,9 +268,10 @@ function buatComment(buttonElement) {
     }
 
     if(buttonElement.closest('.post').querySelector('.btn-enkrip')){
-        const password = buttonElement.closest('.post').querySelector('.btn-enkrip').getAttribute('password');
+        password = buttonElement.closest('.post').querySelector('.btn-enkrip').getAttribute('password');
         if(password){
             commentContent = iki64_encode(commentContent, password);
+            passworded = true;
         }
     }
 
@@ -285,7 +287,11 @@ function buatComment(buttonElement) {
                 const time = data.created_at;
                 const roomId = data.comment.roomId;
                 const postId = data.comment.postId;
-                const commentContent = data.comment.commentContent;
+                let commentContent = data.comment.commentContent;
+
+                if(passworded == true){
+                    commentContent = iki64_decode(commentContent, password);
+                }
         
                 templateComment(roomId, postId, commentId, commentContent, userName, userColor, time);
         
@@ -301,6 +307,7 @@ function buatComment(buttonElement) {
 }
 
 function buatReply(buttonElement) {
+    let password, passworded;
     var replyContent = buttonElement.previousElementSibling.value.trim();
     const commentId = buttonElement.closest('.comment').getAttribute('commentid');
     const postId = buttonElement.closest('.comment').getAttribute('postid');
@@ -312,9 +319,10 @@ function buatReply(buttonElement) {
     }
 
     if(buttonElement.closest('.post').querySelector('.btn-enkrip')){
-        const password = buttonElement.closest('.post').querySelector('.btn-enkrip').getAttribute('password');
+        let password = buttonElement.closest('.post').querySelector('.btn-enkrip').getAttribute('password');
         if(password){
             replyContent = iki64_encode(replyContent, password);
+            passworded = true;
         }
     }
 
@@ -331,7 +339,12 @@ function buatReply(buttonElement) {
                 const roomId = data.reply.roomId;
                 const postId = data.reply.postId;
                 const commentId = data.reply.commentId;
-                const replyContent = data.reply.replyContent;
+                let replyContent = data.reply.replyContent;
+
+                if(passworded == true){
+                    replyContent = iki64_decode(replyContent, password);
+                }
+
                 templateReply(roomId, postId, commentId, replyId, replyContent, userName, userColor, time);
         
                 // buttonElement.parentElement.parentElement.querySelector('.input-toggle').click();
@@ -553,7 +566,88 @@ function editPost(element){
 }
 
 
+function editCommentReplyOpen(element){
+    let point, pointId, comment, reply, targetGet, editor;
+    let post = element.closest('.post');
 
+    if(element.parentElement.classList.contains('read-comment')){
+        point = 'comment';
+        comment = element.closest('.comment');
+        pointId = comment.getAttribute('commentid');
+        targetGet = 'getComment';
+        editor = comment.querySelector('.isi-comment');
+    }else if(element.parentElement.classList.contains('read-reply')){
+        point = 'reply';
+        reply = element.closest('.reply');
+        pointId = reply.getAttribute('replyid');
+        targetGet = 'getReply';
+        editor = reply.querySelector('.isi-reply');
+    }
+
+    postData('api.php', { [targetGet]: pointId }, true)
+        .then(response => {
+            if(response.error && response.error.token){logout()}
+            if(response.error){
+                alert(response.error);
+                return false;
+            }else{
+                console.log(response);
+                let content = response.comment ? response.comment.commentContent : response.reply.replyContent;
+                if(post.querySelector('.btn-enkrip')){
+                    const password = post.querySelector('.btn-enkrip').getAttribute('password');
+                    if(password){
+                        editor.innerHTML = templateEditCommentReply(iki64_decode(content, password));
+                    }else{
+                        editor.innerHTML = templateEditCommentReply(content);
+                    }
+                }else{
+                    editor.innerHTML = templateEditCommentReply(content);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Failed to post data:', error);
+            alert('Error');
+        });
+}
+
+
+function editCommentReply(element){
+    let content = element.previousElementSibling.value;
+    const post = element.closest('.post');
+    let point, pointId;
+    if(element.parentElement.parentElement.classList.contains('isi-comment')){
+        point = 'comment';
+        pointId = element.closest('.comment').getAttribute('commentid');
+    }else if(element.parentElement.parentElement.classList.contains('isi-reply')){
+        point = 'reply';
+        pointId = element.closest('.reply').getAttribute('replyid');
+    }
+
+    if(post.querySelector('.btn-enkrip')){
+        const password = post.querySelector('.btn-enkrip').getAttribute('password');
+        if(password){
+            content = iki64_encode(content, password);
+        }
+    }
+
+
+    postData('api.php', { 'editCommentReply': {point, pointId, content} }, true)
+        .then(response => {
+            if(response.error && response.error.token){logout()}
+            if(response.error){
+                alert(response.error);
+                return false;
+            }else{
+                // console.log(response);
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Failed to post data:', error);
+            alert('Error');
+        });
+}
 
 
 

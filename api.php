@@ -310,24 +310,88 @@ if(@$postData['getPost']){
 }
 
 if(@$postData['editPost']){
-    // $post = $postStore->findById($postData['getPost']);
-    $editPost = $postStore->updateById($postData['editPost']['postId'], 
-    [
-        'post.postContent' => $postData['editPost']['postContent'],
-        'post.postContentIsi' => $postData['editPost']['postContentIsi'],
-        'edited_at' => getCurrentTimestamp()
-    ]);
+    $post = $postStore->findById($postData['editPost']['postId']);
+    if($verifiedPayload['userid'] == $post['userid']){
+        $editPost = $postStore->updateById($postData['editPost']['postId'], 
+        [
+            'post.postContent' => $postData['editPost']['postContent'],
+            'post.postContentIsi' => $postData['editPost']['postContentIsi'],
+            'edited_at' => getCurrentTimestamp()
+        ]);
+        
+        echo json_encode($editPost);
     
-    echo json_encode($editPost);
-
-    $activityStore->insert([
-        'activity' => 'Edit Post',
-        'point' => 'post',
-        'id'=> $editPost['_id'],
-        'userid' => $verifiedPayload['userid'],
-        'created_at' => getCurrentTimestamp()
-    ]);
+        $activityStore->insert([
+            'activity' => 'Edit Post',
+            'point' => 'post',
+            'id'=> $editPost['_id'],
+            'userid' => $verifiedPayload['userid'],
+            'created_at' => getCurrentTimestamp()
+        ]);   
+    }
 }
+
+
+if(@$postData['getComment']){
+    if($verifiedPayload){
+        $comment = $commentStore->findById($postData['getComment']);
+        echo json_encode($comment);
+    }
+}
+
+if(@$postData['getReply']){
+    if($verifiedPayload){
+        $reply = $replyStore->findById($postData['getReply']);
+        echo json_encode($reply);
+    }
+}
+
+if(@$postData['editCommentReply']){
+    if($postData['editCommentReply']['point'] == 'comment'){
+        $point = $commentStore->findById($postData['editCommentReply']['pointId']);
+    }elseif($postData['editCommentReply']['point'] == 'reply'){
+        $point = $replyStore->findById($postData['editCommentReply']['pointId']);
+    }
+
+    if($verifiedPayload['userid'] == $point['userid']){
+        if($postData['editCommentReply']['point'] == 'comment'){
+            $edit = $commentStore->updateById($postData['editCommentReply']['pointId'], 
+                    [
+                        'comment.commentContent' => $postData['editCommentReply']['content'],
+                        'edited_at' => getCurrentTimestamp()
+                    ]);
+
+            $activityStore->insert([
+                'activity' => 'Edit Comment',
+                'point' => 'comment',
+                'id'=> $edit['_id'],
+                'userid' => $verifiedPayload['userid'],
+                'created_at' => getCurrentTimestamp()
+            ]);
+        }elseif($postData['editCommentReply']['point'] == 'reply'){
+
+            $edit = $replyStore->updateById($postData['editCommentReply']['pointId'], 
+                    [
+                        'reply.replyContent' => $postData['editCommentReply']['content'],
+                        'edited_at' => getCurrentTimestamp()
+                    ]);
+
+            $activityStore->insert([
+                'activity' => 'Edit Reply',
+                'point' => 'reply',
+                'id'=> $edit['_id'],
+                'userid' => $verifiedPayload['userid'],
+                'created_at' => getCurrentTimestamp()
+            ]);
+        }
+
+
+        echo json_encode([$edit]);
+    }
+    
+
+}
+
 
 
 if(@$postData['deleteByMod']){

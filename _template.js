@@ -1,6 +1,6 @@
 function templateRoom(roomId, roomName){
     if(window.moderator == window.userName){
-        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);" style="display:block; text-align:right;">[Delete]</span>`;
+        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);" style="display:block; text-align:right;">❌</span>`;
     }
 
     const roomElement = `<div class="room" roomId="${roomId}">
@@ -23,7 +23,7 @@ function templateRoom(roomId, roomName){
 
 function templatePost(roomId, postId, postContent, postContentIsi, userName, userColor, time, editedCheck=null) {
     if(window.userName == userName){
-        var edit = `<span class="user-tag" style="color: blue; cursor:pointer;" onclick="editPostOpen(this);">[edit]</span>`;
+        var edit = `<span class="user-tag" style="color: blue; cursor:pointer;" onclick="editPostOpen(this);">✏️</span>`;
     }else{var edit = '';}
 
     if(editedCheck){
@@ -35,7 +35,7 @@ function templatePost(roomId, postId, postContent, postContentIsi, userName, use
     }
 
     if(window.moderator == window.userName){
-        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);">[Delete]</span>`;
+        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);">❌</span>`;
     }
 
     const postElement = `<div class="post" postid="${postId}" roomId="${roomId}">
@@ -77,12 +77,18 @@ function templatePost(roomId, postId, postContent, postContentIsi, userName, use
 
 function templateComment(roomId, postId, commentId, commentContent, userName, userColor, time){
     if(window.moderator == window.userName){
-        var deleteByModerator = `<span class="deleteByMod" onclick="deleteByModerator(this);">[Delete]</span>`;
+        var deleteByModerator = `<span class="deleteByMod" onclick="deleteByModerator(this);">❌</span>`;
     }
+
+    if(window.userName == userName){
+        var edit = `<span class="user-tag" style="color: blue; cursor:pointer;" onclick="editCommentReplyOpen(this);">✏️</span>`;
+    }else{var edit = '';}
+
     const commentElement = `<div class="comment" commentid="${commentId}" postId="${postId}" roomId="${roomId}">
                                 <div class="read-comment">
                                     <span class="user-tag" style="color: ${listWarna[userColor]}">[${userName}]</span>
                                     <span class="time-tag" onclick="alert(formatTime(${time}))" created_at="${time}">${timeAgo(time)}</span>
+                                    ${edit}
                                     ${deleteByModerator || ''}
                                     <div class="isi-comment md">${marked.parse(escapeHTML(commentContent))}</div>
                                 </div>
@@ -101,12 +107,18 @@ function templateComment(roomId, postId, commentId, commentContent, userName, us
 
 function templateReply(roomId, postId, commentId, replyId, replyContent, userName, userColor, time){
     if(window.moderator == window.userName){
-        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);">[Delete]</span>`;
+        var deleteByModerator = `<span class="deleteByMod"  onclick="deleteByModerator(this);">❌</span>`;
     }
+
+    if(window.userName == userName){
+        var edit = `<span class="user-tag" style="color: blue; cursor:pointer;" onclick="editCommentReplyOpen(this);">✏️</span>`;
+    }else{var edit = '';}
+
     const replyElement = `<div class="reply" replyId="${replyId}" postId="${postId}" commentId="${commentId}" roomId="${roomId}">
                             <div class="read-reply">
                                 <span class="user-tag" style="color: ${listWarna[userColor]}">[${userName}]</span>
                                 <span class="time-tag" onclick="alert(formatTime(${time}))" created_at="${time}">${timeAgo(time)}</span>
+                                ${edit}
                                 ${deleteByModerator || ''}
                                 <div class="isi-reply md">${marked.parse(escapeHTML(replyContent))}</div>
                             </div>
@@ -119,7 +131,7 @@ function templateReply(roomId, postId, commentId, replyId, replyContent, userNam
 
 function templateEditPost(postContent, postContentIsi){
     const editPostElement = `
-    <div class="input-post">
+                            <div class="input-post">
                                 <input type="text" class="postContent" placeholder="Judul Postingan" value="${postContent}">
                                 <br>
                                 <div class="editor-container">
@@ -132,6 +144,16 @@ function templateEditPost(postContent, postContentIsi){
                             </div>
     `;
     return editPostElement;
+}
+
+function templateEditCommentReply(content){
+    const editCommentReplyElement = `
+                                    <div class="input-container">
+                                        <textarea class="replyContent" rows="2">${content}</textarea>
+                                        <button onclick="editCommentReply(this)" class="btn-reply">Balas</button>
+                                    </div>
+    `;
+    return editCommentReplyElement;
 }
 
 function templateNewActivity(activity, point, userid, id, created_at) {
